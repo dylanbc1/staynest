@@ -4,7 +4,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import {v4 as uuid} from 'uuid';
 import * as bcrypt from 'bcrypt';
-import { Role } from 'src/enums/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -43,17 +42,14 @@ export class UserService {
       
       const user = this.userRepository.create({
         ...userData,
-        password: bcrypt.hashSync( password, 10 ),
+        password: bcrypt.hashSync(password, 10),
       });
 
       await this.userRepository.save( user )
-      delete user.password;
+      
 
-      return {
-        ...user,
-        token: this.jwtService.sign({ id: user.id })
-      };
-      // TODO: Retornar el JWT de acceso
+      return user;
+      
 
     } catch (error) {
       this.handleDBErrors(error);
@@ -62,22 +58,26 @@ export class UserService {
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.userRepository.find();
   }
 
-  findOne(id: string) {
-    const user: User = this.users.find(user => user.id === id);
+  async findOne(id: string) {
+    const user: User = await this.userRepository.findOne({
+      where: { id }
+    });
 
-        // si no encuentra el car
-        if (!user) {
-            throw new NotFoundException(`Car with ID ${id} not found`);
-        }
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
 
-        return user;
+    return user;
   }
 
   async findByEmail(email: string) {
-    const user: User = this.users.find(user => user.email === email);
+
+    const user: User = await this.userRepository.findOne({
+      where: { email }
+    });
 
     if (!user) {
         throw new NotFoundException(`User with email ${email} not found`);
@@ -85,12 +85,36 @@ export class UserService {
 
     return user;
   }
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+
+    const user = await this.userRepository.preload({
+      id: id,
+      ...updateUserDto
+    });
+
+    if ( !user ) throw new NotFoundException(`User with id: ${ id } not found`);
+
+    try {
+      await this.userRepository.save( user );
+      return user;
+      
+    } catch (error) {
+      this.handleDBErrors(error);
+    }
+   
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user = await this.findOne( id );
+    await this.userRepository.delete(id);
+  }
+
+  async populateWithSeedData(users: User[]) {
+    try {
+      await this.userRepository.save(users);
+    } catch (error) {
+      this.handleDBErrors(error);
+    }
   }
   private handleDBErrors( error: any ): never {
 

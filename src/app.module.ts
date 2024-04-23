@@ -5,21 +5,21 @@ import { PropertyModule } from './property/property.module';
 import { BookingModule } from './booking/booking.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { ReportsModule } from './reports/reports.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { AuthGuard } from './auth/guards/auth.guard';
-
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
-import { CommonModule } from './common/common.module';
+import { ReportModule } from './report/report.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
     isGlobal: true,
     }),
+
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -30,12 +30,13 @@ import { CommonModule } from './common/common.module';
       synchronize: true, 
       autoLoadEntities: true,
     }),
+
     PropertyModule,
     BookingModule,
     UserModule,
     AuthModule,
-    ReportsModule,
-    CommonModule,
+    ReportModule,
+    ReportModule,SeedModule
     ],
   controllers: [AppController],
   providers: [AppService, 

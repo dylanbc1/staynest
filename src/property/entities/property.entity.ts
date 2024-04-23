@@ -29,37 +29,37 @@ export class Property {
     })
     address: string;
 
-    @Column('number', {
+    @Column('numeric', {
         nullable: false,   
     })
     latitude: number;
 
-    @Column('number', {
+    @Column('numeric', {
         nullable: false,   
     })
     altitude: number;
     
-    @Column('number', {
+    @Column('numeric', {
         nullable: false,   
     })
     rooms: number;
     
-    @Column('number', {
+    @Column('numeric', {
         nullable: false,   
     })
     bathrooms: number;
     
-    @Column('number', {
+    @Column('numeric', {
         nullable: false,   
     })
     area: number;
     
-    @Column('number', {
+    @Column('numeric', {
         nullable: false,   
     })
     cost_per_night: number; // costo por noche
     
-    @Column('number', {
+    @Column('numeric', {
         nullable: false,   
     })
     max_people: number; // max gente que puede alojar
@@ -74,8 +74,11 @@ export class Property {
     // al slug
     @BeforeInsert()
     checkSlug(): void {
+        const addressConv: string = this.address.replace(/\s+/g, '-')
+        const addressConv2: string = addressConv.replace('#', '-')
+
         if (!this.slug) {
-            this.slug = `${this.country}-${this.city}-${this.address}`;
+            this.slug = `${this.country}-${this.city}-${addressConv2}`;
         }
 
         this.slug = this.slug.toLowerCase();
