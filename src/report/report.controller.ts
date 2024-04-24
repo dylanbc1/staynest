@@ -10,7 +10,6 @@ export class ReportController {
   /* istanbul ignore next */
   @Get('occupancy')
   generateReport() {
-    console.log('generating report');
     return this.reportService.generateOccupancyReport();
   }
 
