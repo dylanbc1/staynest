@@ -14,27 +14,36 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
-  @Roles(Role.USER)
+  @Roles(Role.OWNER, Role.USER)
   @UseGuards(AuthGuard, RolesGuard)
   @Post()
   create(@Body() createBookingDto: CreateBookingDto) {
     return this.bookingService.create(createBookingDto);
   }
 
-  @UseGuards(AuthGuard)
+  @Roles(Role.OWNER, Role.USER)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get()
+  findAll() {
+    return this.bookingService.findAll();
+  }
+
+  @Roles(Role.OWNER, Role.USER)
+  @UseGuards(AuthGuard, RolesGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.bookingService.findOne(String(id));
   }
 
-  @UseGuards(AuthGuard)
+  @Roles(Role.OWNER, Role.USER)
+  @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
     return this.bookingService.update(id, updateBookingDto);
   }
 
-  
-  @UseGuards(AuthGuard) 
+  @Roles(Role.OWNER, Role.USER)
+  @UseGuards(AuthGuard, RolesGuard) 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.bookingService.remove(String(id));

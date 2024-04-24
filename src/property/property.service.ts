@@ -34,7 +34,7 @@ export class PropertyService {
     }
   }
 
-  // find all - recibimos pagination por parametro
+  // find all
   async findAll( ) {
     // find 
     return await this.propertyRepository.find();
@@ -90,6 +90,14 @@ export class PropertyService {
     try {
       const property = await this.findOne( id );
       await this.propertyRepository.remove( property );
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
+  }
+
+  async populateWithSeedData(property: Property[]){
+    try {
+      await this.propertyRepository.save(property);
     } catch (error) {
       this.handleDBExceptions(error);
     }
